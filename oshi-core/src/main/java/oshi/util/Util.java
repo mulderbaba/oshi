@@ -18,8 +18,9 @@
  */
 package oshi.util;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.text.MessageFormat;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * General utility methods
@@ -27,7 +28,7 @@ import org.slf4j.LoggerFactory;
  * @author widdis[at]gmail[dot]com
  */
 public class Util {
-    private static final Logger LOG = LoggerFactory.getLogger(Util.class);
+    private static final Logger LOG = Logger.getLogger(Util.class.getName());
 
     private Util() {
     }
@@ -40,11 +41,11 @@ public class Util {
      */
     public static void sleep(long ms) {
         try {
-            LOG.trace("Sleeping for {} ms", ms);
+            LOG.log(Level.FINEST, MessageFormat.format("Sleeping for {0} ms", ms));
             Thread.sleep(ms);
         } catch (InterruptedException e) { // NOSONAR squid:S2142
-            LOG.trace("", e);
-            LOG.warn("Interrupted while sleeping for {} ms", ms);
+            LOG.log(Level.FINEST, "", e);
+            LOG.log(Level.WARNING, MessageFormat.format("Interrupted while sleeping for {0} ms", ms));
         }
     }
 
@@ -61,7 +62,7 @@ public class Util {
     public static void sleepAfter(long startTime, long ms) {
         long now = System.currentTimeMillis();
         long until = startTime + ms;
-        LOG.trace("Sleeping until {}", until);
+        LOG.log(Level.FINEST, MessageFormat.format("Sleeping until {0}", until));
         if (now < until) {
             sleep(until - now);
         }

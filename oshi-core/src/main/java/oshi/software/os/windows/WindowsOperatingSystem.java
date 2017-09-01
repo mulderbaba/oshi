@@ -21,9 +21,8 @@ package oshi.software.os.windows;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.sun.jna.Native;
 import com.sun.jna.platform.win32.Advapi32;
@@ -46,11 +45,13 @@ import oshi.util.ParseUtil;
 import oshi.util.platform.windows.WmiUtil;
 import oshi.util.platform.windows.WmiUtil.ValueType;
 
+import static java.text.MessageFormat.format;
+
 public class WindowsOperatingSystem extends AbstractOperatingSystem {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Logger LOG = LoggerFactory.getLogger(WindowsOperatingSystem.class);
+    private static final Logger LOG = Logger.getLogger(WindowsOperatingSystem.class.getName());
 
     // For WMI Process queries
     private static String processProperties = "Name,ExecutablePath,CommandLine,ExecutionState,ProcessID,ParentProcessId"
@@ -161,8 +162,9 @@ public class WindowsOperatingSystem extends AbstractOperatingSystem {
                         // Access denied errors are common and will silently
                         // fail
                         if (error != ERROR_ACCESS_DENIED) {
-                            LOG.error("Failed to get process token for process {}: {}", proc.getProcessID(),
-                                    Kernel32.INSTANCE.GetLastError());
+                            LOG.log(Level.SEVERE, format("Failed to get process token for process {0}: {1}",
+                                    proc.getProcessID(),
+                                    Kernel32.INSTANCE.GetLastError()));
                         }
                     }
                 }
@@ -226,7 +228,7 @@ public class WindowsOperatingSystem extends AbstractOperatingSystem {
     public int getProcessCount() {
         PERFORMANCE_INFORMATION perfInfo = new PERFORMANCE_INFORMATION();
         if (!Psapi.INSTANCE.GetPerformanceInfo(perfInfo, perfInfo.size())) {
-            LOG.error("Failed to get Performance Info. Error code: {}", Kernel32.INSTANCE.GetLastError());
+            LOG.log(Level.SEVERE, format("Failed to get Performance Info. Error code: {0}", Kernel32.INSTANCE.GetLastError()));
             return 0;
         }
         return perfInfo.ProcessCount.intValue();
@@ -239,7 +241,7 @@ public class WindowsOperatingSystem extends AbstractOperatingSystem {
     public int getThreadCount() {
         PERFORMANCE_INFORMATION perfInfo = new PERFORMANCE_INFORMATION();
         if (!Psapi.INSTANCE.GetPerformanceInfo(perfInfo, perfInfo.size())) {
-            LOG.error("Failed to get Performance Info. Error code: {}", Kernel32.INSTANCE.GetLastError());
+            LOG.log(Level.SEVERE, format("Failed to get Performance Info. Error code: {0}", Kernel32.INSTANCE.GetLastError()));
             return 0;
         }
         return perfInfo.ThreadCount.intValue();
@@ -262,20 +264,20 @@ public class WindowsOperatingSystem extends AbstractOperatingSystem {
         boolean success = Advapi32.INSTANCE.OpenProcessToken(Kernel32.INSTANCE.GetCurrentProcess(),
                 WinNT.TOKEN_QUERY | WinNT.TOKEN_ADJUST_PRIVILEGES, hToken);
         if (!success) {
-            LOG.error("OpenProcessToken failed. Error: {}" + Native.getLastError());
+            LOG.log(Level.SEVERE, format("OpenProcessToken failed. Error: {0}" + Native.getLastError()));
             return;
         }
         WinNT.LUID luid = new WinNT.LUID();
         success = Advapi32.INSTANCE.LookupPrivilegeValue(null, WinNT.SE_DEBUG_NAME, luid);
         if (!success) {
-            LOG.error("LookupprivilegeValue failed. Error: {}" + Native.getLastError());
+            LOG.log(Level.SEVERE, format("LookupprivilegeValue failed. Error: {0}" + Native.getLastError()));
             return;
         }
         WinNT.TOKEN_PRIVILEGES tkp = new WinNT.TOKEN_PRIVILEGES(1);
         tkp.Privileges[0] = new WinNT.LUID_AND_ATTRIBUTES(luid, new DWORD(WinNT.SE_PRIVILEGE_ENABLED));
         success = Advapi32.INSTANCE.AdjustTokenPrivileges(hToken.getValue(), false, tkp, 0, null, null);
         if (!success) {
-            LOG.error("AdjustTokenPrivileges failed. Error: {}" + Native.getLastError());
+            LOG.log(Level.SEVERE, format("AdjustTokenPrivileges failed. Error: {0}", Native.getLastError()));
         }
         Kernel32.INSTANCE.CloseHandle(hToken.getValue());
     }

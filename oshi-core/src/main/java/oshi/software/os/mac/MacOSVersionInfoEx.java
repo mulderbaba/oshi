@@ -18,18 +18,19 @@
  */
 package oshi.software.os.mac;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import oshi.software.common.AbstractOSVersionInfoEx;
 import oshi.util.ParseUtil;
 import oshi.util.platform.mac.SysctlUtil;
+
+import java.text.MessageFormat;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class MacOSVersionInfoEx extends AbstractOSVersionInfoEx {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Logger LOG = LoggerFactory.getLogger(MacOSVersionInfoEx.class);
+    private static final Logger LOG = Logger.getLogger(MacOSVersionInfoEx.class.getName());
 
     private int osxVersionNumber = -1;
 
@@ -79,7 +80,7 @@ public class MacOSVersionInfoEx extends AbstractOSVersionInfoEx {
             default:
             }
         }
-        LOG.warn("Unable to parse version {} to a codename.", getVersion());
+        LOG.log(Level.WARNING, MessageFormat.format("Unable to parse version {0} to a codename.", getVersion()));
         return "";
     }
 }

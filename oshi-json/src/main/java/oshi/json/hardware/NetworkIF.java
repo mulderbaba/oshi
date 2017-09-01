@@ -20,15 +20,14 @@ package oshi.json.hardware;
 
 import java.net.NetworkInterface;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.json.Json;
 import javax.json.JsonArrayBuilder;
 import javax.json.JsonBuilderFactory;
 import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import oshi.SystemInfo;
 import oshi.json.json.AbstractOshiJsonObject;
@@ -44,7 +43,7 @@ public class NetworkIF extends AbstractOshiJsonObject {
 
     private static final long serialVersionUID = 2L;
 
-    private static final Logger LOG = LoggerFactory.getLogger(NetworkIF.class);
+    private static final Logger LOG = Logger.getLogger(NetworkIF.class.getName());
 
     private transient JsonBuilderFactory jsonFactory = Json.createBuilderFactory(null);
 
@@ -285,7 +284,7 @@ public class NetworkIF extends AbstractOshiJsonObject {
             oshi.hardware.platform.unix.freebsd.FreeBsdNetworks.updateNetworkStats(this.networkIf);
             break;
         default:
-            LOG.error("Unsupported platform. No update performed.");
+            LOG.log(Level.SEVERE, "Unsupported platform. No update performed.");
             break;
         }
     }

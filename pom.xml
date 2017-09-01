@@ -117,17 +117,6 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-			<version>1.7.24</version>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-simple</artifactId>
-			<version>1.7.24</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.12</version>
@@ -222,30 +211,6 @@
 					<groupId>org.codehaus.mojo</groupId>
 					<artifactId>build-helper-maven-plugin</artifactId>
 					<version>3.0.0</version>
-				</plugin>
-				<!-- Packaging types / tools -->
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-jar-plugin</artifactId>
-					<version>3.0.2</version>
-					<configuration>
-						<archive>
-							<manifest>
-								<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-								<addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
-							</manifest>
-							<manifestEntries>
-								<Build-Time>${maven.build.timestamp}</Build-Time>
-								<Copyright>${copyright}</Copyright>
-								<Git-Revision>${git.commit.id}</Git-Revision>
-								<Os-Name>${os.name}</Os-Name>
-								<Os-Arch>${os.arch}</Os-Arch>
-								<Os-Version>${os.version}</Os-Version>
-								<X-Compile-Source-JDK>${maven.compiler.source}</X-Compile-Source-JDK>
-								<X-Compile-Target-JDK>${maven.compiler.target}</X-Compile-Target-JDK>
-							</manifestEntries>
-						</archive>
-					</configuration>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>

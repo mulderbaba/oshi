@@ -21,10 +21,9 @@ package oshi.software.os.mac;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.IntByReference;
@@ -56,7 +55,7 @@ public class MacFileSystem implements FileSystem {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Logger LOG = LoggerFactory.getLogger(MacFileSystem.class);
+    private static final Logger LOG = Logger.getLogger(MacFileSystem.class.getName());
 
     // Regexp matcher for /dev/disk1 etc.
     private static final Pattern LOCAL_DISK = Pattern.compile("/dev/disk\\d");
@@ -74,7 +73,7 @@ public class MacFileSystem implements FileSystem {
         // bsd names
         DASessionRef session = DiskArbitration.INSTANCE.DASessionCreate(CfUtil.ALLOCATOR);
         if (session == null) {
-            LOG.error("Unable to open session to DiskArbitration framework.");
+            LOG.log(Level.SEVERE, "Unable to open session to DiskArbitration framework.");
         }
 
         // List of file systems

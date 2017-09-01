@@ -36,14 +36,14 @@ i * Oshi (https://github.com/dblock/oshi)
  */
 package oshi.util.platform.windows;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.sun.jna.NativeLong;
 import com.sun.jna.Pointer;
@@ -69,7 +69,7 @@ import oshi.util.ParseUtil;
  * @author widdis[at]gmail[dot]com
  */
 public class WmiUtil {
-    private static final Logger LOG = LoggerFactory.getLogger(WmiUtil.class);
+    private static final Logger LOG = Logger.getLogger(WmiUtil.class.getName());
 
     public static final String DEFAULT_NAMESPACE = "ROOT\\CIMV2";
 
@@ -375,11 +375,11 @@ public class WmiUtil {
         if (COMUtils.FAILED(hres)) {
             if (hres.intValue() == Ole32.RPC_E_CHANGED_MODE) {
                 // Com already initialized, ignore error
-                LOG.debug("COM already initialized.");
+                LOG.log(Level.FINE, "COM already initialized.");
                 securityInitialized = true;
                 return true;
             }
-            LOG.error(String.format("Failed to initialize COM library. Error code = 0x%08x", hres.intValue()));
+            LOG.log(Level.SEVERE, String.format("Failed to initialize COM library. Error code = 0x%08x", hres.intValue()));
             return false;
         }
         comInitialized = true;
@@ -392,7 +392,7 @@ public class WmiUtil {
         hres = Ole32.INSTANCE.CoInitializeSecurity(null, new NativeLong(-1), null, null,
                 Ole32.RPC_C_AUTHN_LEVEL_DEFAULT, Ole32.RPC_C_IMP_LEVEL_IMPERSONATE, null, Ole32.EOAC_NONE, null);
         if (COMUtils.FAILED(hres) && hres.intValue() != Ole32.RPC_E_TOO_LATE) {
-            LOG.error(String.format("Failed to initialize security. Error code = 0x%08x", hres.intValue()));
+            LOG.log(Level.SEVERE, String.format("Failed to initialize security. Error code = 0x%08x", hres.intValue()));
             Ole32.INSTANCE.CoUninitialize();
             return false;
         }
@@ -424,13 +424,13 @@ public class WmiUtil {
         // pSvc to make IWbemServices calls.
         HRESULT hres = loc.ConnectServer(new BSTR(namespace), null, null, null, null, null, null, pSvc);
         if (COMUtils.FAILED(hres)) {
-            LOG.error(String.format("Could not connect to namespace %s. Error code = 0x%08x", namespace,
+            LOG.log(Level.SEVERE, String.format("Could not connect to namespace %s. Error code = 0x%08x", namespace,
                     hres.intValue()));
             loc.Release();
             unInitCOM();
             return false;
         }
-        LOG.debug("Connected to {} WMI namespace", namespace);
+        LOG.log(Level.FINE, MessageFormat.format("Connected to {0} WMI namespace", namespace));
         loc.Release();
 
         // Step 5: --------------------------------------------------
@@ -438,7 +438,7 @@ public class WmiUtil {
         hres = Ole32.INSTANCE.CoSetProxyBlanket(pSvc.getValue(), Ole32.RPC_C_AUTHN_WINNT, Ole32.RPC_C_AUTHZ_NONE, null,
                 Ole32.RPC_C_AUTHN_LEVEL_CALL, Ole32.RPC_C_IMP_LEVEL_IMPERSONATE, null, Ole32.EOAC_NONE);
         if (COMUtils.FAILED(hres)) {
-            LOG.error(String.format("Could not set proxy blanket. Error code = 0x%08x", hres.intValue()));
+            LOG.log(Level.SEVERE, String.format("Could not set proxy blanket. Error code = 0x%08x", hres.intValue()));
             new WbemServices(pSvc.getValue()).Release();
             unInitCOM();
             return false;
@@ -470,13 +470,13 @@ public class WmiUtil {
         // Use the IWbemServices pointer to make requests of WMI ----
         String query = String.format("SELECT %s FROM %s %s", properties, wmiClass,
                 whereClause != null ? whereClause : "");
-        LOG.debug("Query: {}", query);
+        LOG.log(Level.FINE, MessageFormat.format("Query: {0}", query));
         HRESULT hres = svc.ExecQuery(new BSTR("WQL"), new BSTR(query),
                 new NativeLong(
                         EnumWbemClassObject.WBEM_FLAG_FORWARD_ONLY | EnumWbemClassObject.WBEM_FLAG_RETURN_IMMEDIATELY),
                 null, pEnumerator);
         if (COMUtils.FAILED(hres)) {
-            LOG.error(String.format("Query '%s' failed. Error code = 0x%08x", query, hres.intValue()));
+            LOG.log(Level.SEVERE, String.format("Query '%s' failed. Error code = 0x%08x", query, hres.intValue()));
             svc.Release();
             unInitCOM();
             return false;

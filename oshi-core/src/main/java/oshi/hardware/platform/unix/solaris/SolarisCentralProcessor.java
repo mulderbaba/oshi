@@ -19,11 +19,10 @@
 package oshi.hardware.platform.unix.solaris;
 
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import oshi.hardware.common.AbstractCentralProcessor;
 import oshi.jna.platform.linux.Libc;
@@ -41,7 +40,7 @@ public class SolarisCentralProcessor extends AbstractCentralProcessor {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Logger LOG = LoggerFactory.getLogger(SolarisCentralProcessor.class);
+    private static final Logger LOG = Logger.getLogger(SolarisCentralProcessor.class.getName());
 
     private static final Pattern PSRINFO = Pattern.compile(".*physical processor has (\\d+) virtual processors.*");
 
@@ -55,7 +54,7 @@ public class SolarisCentralProcessor extends AbstractCentralProcessor {
         // Initialize tick arrays
         initTicks();
 
-        LOG.debug("Initialized Processor");
+        LOG.log(Level.FINE, "Initialized Processor");
     }
 
     private void initVars() {
@@ -90,11 +89,11 @@ public class SolarisCentralProcessor extends AbstractCentralProcessor {
             }
         }
         if (this.logicalProcessorCount < 1) {
-            LOG.error("Couldn't find logical processor count. Assuming 1.");
+            LOG.log(Level.SEVERE, "Couldn't find logical processor count. Assuming 1.");
             this.logicalProcessorCount = 1;
         }
         if (this.physicalProcessorCount < 1) {
-            LOG.error("Couldn't find physical processor count. Assuming 1.");
+            LOG.log(Level.SEVERE, "Couldn't find physical processor count. Assuming 1.");
             this.physicalProcessorCount = 1;
         }
     }

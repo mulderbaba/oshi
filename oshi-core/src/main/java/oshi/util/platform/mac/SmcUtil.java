@@ -21,9 +21,8 @@ package oshi.util.platform.mac;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.sun.jna.ptr.IntByReference;
 
@@ -42,7 +41,7 @@ import oshi.util.Util;
  * @author widdis[at]gmail[dot]com
  */
 public class SmcUtil {
-    private static final Logger LOG = LoggerFactory.getLogger(SmcUtil.class);
+    private static final Logger LOG = Logger.getLogger(SmcUtil.class.getName());
 
     private static IOConnect conn = new IOConnect();
 
@@ -67,14 +66,14 @@ public class SmcUtil {
     public static int smcOpen() {
         int service = IOKitUtil.getMatchingService("AppleSMC");
         if (service == 0) {
-            LOG.error("Error: no SMC found");
+            LOG.log(Level.SEVERE, "Error: no SMC found");
             return 1;
         }
 
         int result = IOKit.INSTANCE.IOServiceOpen(service, SystemB.INSTANCE.mach_task_self(), 0, conn);
         IOKit.INSTANCE.IOObjectRelease(service);
         if (result != 0) {
-            LOG.error(String.format("Error: IOServiceOpen() = 0x%08x", result));
+            LOG.log(Level.SEVERE, String.format("Error: IOServiceOpen() = 0x%08x", result));
             return result;
         }
         // Delay to improve success of next query

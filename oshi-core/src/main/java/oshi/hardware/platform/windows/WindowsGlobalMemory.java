@@ -18,11 +18,11 @@
  */
 package oshi.hardware.platform.windows;
 
+import java.text.MessageFormat;
 import java.util.List;
 import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.sun.jna.platform.win32.Kernel32;
 
@@ -40,7 +40,7 @@ public class WindowsGlobalMemory extends AbstractGlobalMemory {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Logger LOG = LoggerFactory.getLogger(WindowsGlobalMemory.class);
+    private static final Logger LOG = Logger.getLogger(WindowsGlobalMemory.class.getName());
 
     private transient PERFORMANCE_INFORMATION perfInfo = new PERFORMANCE_INFORMATION();
 
@@ -54,7 +54,8 @@ public class WindowsGlobalMemory extends AbstractGlobalMemory {
         long now = System.currentTimeMillis();
         if (now - this.lastUpdate > 100) {
             if (!Psapi.INSTANCE.GetPerformanceInfo(this.perfInfo, this.perfInfo.size())) {
-                LOG.error("Failed to get Performance Info. Error code: {}", Kernel32.INSTANCE.GetLastError());
+                LOG.log(Level.SEVERE, MessageFormat.format("Failed to get Performance Info. Error code: {0}",
+                        Kernel32.INSTANCE.GetLastError()));
                 return;
             }
             this.memAvailable = this.perfInfo.PageSize.longValue() * this.perfInfo.PhysicalAvailable.longValue();

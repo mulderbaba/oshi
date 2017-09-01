@@ -20,9 +20,8 @@ package oshi.hardware.platform.windows;
 
 import java.util.List;
 import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.sun.jna.Native;
 import com.sun.jna.platform.win32.Advapi32Util;
@@ -50,7 +49,7 @@ public class WindowsCentralProcessor extends AbstractCentralProcessor {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Logger LOG = LoggerFactory.getLogger(WindowsCentralProcessor.class);
+    private static final Logger LOG = Logger.getLogger(WindowsCentralProcessor.class.getName());
 
     // Save Windows version info for 32 bit/64 bit branch later
     private static final byte majorVersion;
@@ -75,7 +74,7 @@ public class WindowsCentralProcessor extends AbstractCentralProcessor {
         // Initialize tick arrays
         initTicks();
 
-        LOG.debug("Initialized Processor");
+        LOG.log(Level.FINE, "Initialized Processor");
     }
 
     /**
@@ -133,7 +132,7 @@ public class WindowsCentralProcessor extends AbstractCentralProcessor {
         WinBase.FILETIME lpKernelTime = new WinBase.FILETIME();
         WinBase.FILETIME lpUserTime = new WinBase.FILETIME();
         if (!Kernel32.INSTANCE.GetSystemTimes(lpIdleTime, lpKernelTime, lpUserTime)) {
-            LOG.error("Failed to update system idle/kernel/user times. Error code: " + Native.getLastError());
+            LOG.log(Level.SEVERE, "Failed to update system idle/kernel/user times. Error code: " + Native.getLastError());
             return ticks;
         }
         // IOwait:

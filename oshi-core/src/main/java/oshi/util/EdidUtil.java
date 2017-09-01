@@ -20,12 +20,12 @@ package oshi.util;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.text.MessageFormat;
 import java.util.Arrays;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.xml.bind.DatatypeConverter;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * EDID parsing utility.
@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
  */
 public class EdidUtil {
 
-    private static final Logger LOG = LoggerFactory.getLogger(EdidUtil.class);
+    private static final Logger LOG = Logger.getLogger(EdidUtil.class.getName());
 
     private EdidUtil() {
     }
@@ -62,7 +62,7 @@ public class EdidUtil {
         String temp = String
                 .format("%8s%8s", Integer.toBinaryString(edid[8] & 0xFF), Integer.toBinaryString(edid[9] & 0xFF))
                 .replace(' ', '0');
-        LOG.debug("Manufacurer ID: {}", temp);
+        LOG.log(Level.FINE, MessageFormat.format("Manufacurer ID: {0}", temp));
         return String.format("%s%s%s", (char) (64 + Integer.parseInt(temp.substring(1, 6), 2)),
                 (char) (64 + Integer.parseInt(temp.substring(7, 11), 2)),
                 (char) (64 + Integer.parseInt(temp.substring(12, 16), 2))).replace("@", "");
@@ -91,7 +91,7 @@ public class EdidUtil {
      */
     public static String getSerialNo(byte[] edid) {
         // Bytes 12-15 are Serial number (last 4 characters)
-        LOG.debug("Serial number: {}", Arrays.toString(Arrays.copyOfRange(edid, 12, 16)));
+        LOG.log(Level.FINE, MessageFormat.format("Serial number: {0}", Arrays.toString(Arrays.copyOfRange(edid, 12, 16))));
         return String.format("%s%s%s%s", getAlphaNumericOrHex(edid[15]), getAlphaNumericOrHex(edid[14]),
                 getAlphaNumericOrHex(edid[13]), getAlphaNumericOrHex(edid[12]));
     }
@@ -122,7 +122,7 @@ public class EdidUtil {
     public static int getYear(byte[] edid) {
         // Byte 17 is manufacture year-1990
         byte temp = edid[17];
-        LOG.debug("Year-1990: {}", temp);
+        LOG.log(Level.FINE, MessageFormat.format("Year-1990: {0}", temp));
         return temp + 1990;
     }
 

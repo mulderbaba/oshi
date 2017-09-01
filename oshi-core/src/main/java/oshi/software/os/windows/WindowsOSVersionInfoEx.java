@@ -22,9 +22,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.sun.jna.platform.win32.User32;
 import com.sun.jna.platform.win32.WinNT;
@@ -39,7 +38,7 @@ public class WindowsOSVersionInfoEx extends AbstractOSVersionInfoEx {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Logger LOG = LoggerFactory.getLogger(WindowsOSVersionInfoEx.class);
+    private static final Logger LOG = Logger.getLogger(WindowsOSVersionInfoEx.class.getName());
 
     private static final ValueType[] queryTypes = { ValueType.STRING, ValueType.UINT32, ValueType.STRING,
             ValueType.STRING, ValueType.UINT32 };
@@ -51,7 +50,7 @@ public class WindowsOSVersionInfoEx extends AbstractOSVersionInfoEx {
         this.versionInfo = WmiUtil.selectObjectsFrom(null, "Win32_OperatingSystem",
                 "Version,ProductType,BuildNumber,CSDVersion,SuiteMask", null, queryTypes);
         if (this.versionInfo.get("Version").isEmpty()) {
-            LOG.warn("No version data available.");
+            LOG.log(Level.WARNING, "No version data available.");
             setVersion(System.getProperty("os.version"));
             setCodeName("");
             setBuildNumber("");
@@ -61,7 +60,7 @@ public class WindowsOSVersionInfoEx extends AbstractOSVersionInfoEx {
             setVersion(parseVersion());
             setCodeName(parseCodeName());
             setBuildNumber(parseBuildNumber());
-            LOG.debug("Initialized OSVersionInfoEx");
+            LOG.log(Level.FINE, "Initialized OSVersionInfoEx");
         }
     }
 

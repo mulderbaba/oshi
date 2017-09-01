@@ -18,11 +18,11 @@
  */
 package oshi.software.os.mac;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.sun.jna.Memory;
 import com.sun.jna.Native;
@@ -47,7 +47,7 @@ public class MacOperatingSystem extends AbstractOperatingSystem {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Logger LOG = LoggerFactory.getLogger(MacOperatingSystem.class);
+    private static final Logger LOG = Logger.getLogger(MacOperatingSystem.class.getName());
 
     private int maxProc = 1024;
     /*
@@ -202,7 +202,8 @@ public class MacOperatingSystem extends AbstractOperatingSystem {
         IntByReference size = new IntByReference(argmax);
         // Fetch arguments
         if (0 != SystemB.INSTANCE.sysctl(mib, mib.length, procargs, size, null, 0)) {
-            LOG.error("Failed syctl call: kern.procargs2, Error code: {}", Native.getLastError());
+            LOG.log(Level.SEVERE, MessageFormat.format("Failed syctl call: kern.procargs2, Error code: {0}",
+                    Native.getLastError()));
         }
         // Procargs contains an int representing total # of args, followed by a
         // null-terminated execpath string and then the arguments, each

@@ -21,9 +21,9 @@ package oshi.hardware.platform.linux;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import oshi.hardware.PowerSource;
 import oshi.hardware.common.AbstractPowerSource;
@@ -38,13 +38,13 @@ public class LinuxPowerSource extends AbstractPowerSource {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Logger LOG = LoggerFactory.getLogger(LinuxPowerSource.class);
+    private static final Logger LOG = Logger.getLogger(LinuxPowerSource.class.getName());
 
     private static final String PS_PATH = "/sys/class/power_supply/";
 
     public LinuxPowerSource(String newName, double newRemainingCapacity, double newTimeRemaining) {
         super(newName, newRemainingCapacity, newTimeRemaining);
-        LOG.debug("Initialized LinuxPowerSource");
+        LOG.log(Level.FINE, "Initialized LinuxPowerSource");
     }
 
     /**

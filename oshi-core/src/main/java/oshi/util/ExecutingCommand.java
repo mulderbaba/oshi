@@ -23,9 +23,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * A class for executing on the command line and returning the result of
@@ -35,7 +34,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ExecutingCommand {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ExecutingCommand.class);
+    private static final Logger LOG = Logger.getLogger(ExecutingCommand.class.getName());
 
     private ExecutingCommand() {
     }
@@ -66,7 +65,7 @@ public class ExecutingCommand {
         try {
             p = Runtime.getRuntime().exec(cmdToRunWithArgs);
         } catch (SecurityException | IOException e) {
-            LOG.trace("", e);
+            LOG.log(Level.FINEST, "", e);
             return new ArrayList<>(0);
         }
 
@@ -78,7 +77,7 @@ public class ExecutingCommand {
             }
             p.waitFor();
         } catch (InterruptedException | IOException e) {
-            LOG.trace("", e);
+            LOG.log(Level.FINEST, "", e);
             return new ArrayList<>(0);
         }
         return sa;

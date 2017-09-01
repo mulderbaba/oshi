@@ -18,16 +18,16 @@
  */
 package oshi.hardware.platform.windows;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.sun.jna.Native;
 import com.sun.jna.platform.win32.SetupApi;
@@ -49,7 +49,7 @@ public class WindowsUsbDevice extends AbstractUsbDevice {
 
     private static final long serialVersionUID = 2L;
 
-    private static final Logger LOG = LoggerFactory.getLogger(WindowsUsbDevice.class);
+    private static final Logger LOG = Logger.getLogger(WindowsUsbDevice.class.getName());
 
     private static final Pattern VENDOR_PRODUCT_ID = Pattern
             .compile(".*(?:VID|VEN)_(\\p{XDigit}{4})&(?:PID|DEV)_(\\p{XDigit}{4}).*");
@@ -156,7 +156,8 @@ public class WindowsUsbDevice extends AbstractUsbDevice {
             // Start with all classes
             HANDLE hinfoSet = SetupApi.INSTANCE.SetupDiGetClassDevs(null, null, null, SetupApi.DIGCF_ALLCLASSES);
             if (hinfoSet == WinNT.INVALID_HANDLE_VALUE) {
-                LOG.error("Invalid handle value for {}. Error code: {}", deviceId, Native.getLastError());
+                LOG.log(Level.SEVERE, MessageFormat.format("Invalid handle value for {0}. Error code: {1}",
+                        deviceId, Native.getLastError()));
                 return;
             }
             // Iterate to find matching parent
@@ -171,7 +172,7 @@ public class WindowsUsbDevice extends AbstractUsbDevice {
             }
         }
         if (devInst == 0) {
-            LOG.error("Unable to find a devnode handle for {}.", deviceId);
+            LOG.log(Level.SEVERE, MessageFormat.format("Unable to find a devnode handle for {0}.", deviceId));
             return;
         }
         // Now iterate the children. Call CM_Get_Child to get first child
@@ -206,14 +207,15 @@ public class WindowsUsbDevice extends AbstractUsbDevice {
     private static String getDeviceId(int devInst) {
         NativeLongByReference ulLen = new NativeLongByReference();
         if (0 != Cfgmgr32.INSTANCE.CM_Get_Device_ID_Size(ulLen, devInst, 0)) {
-            LOG.error("Couldn't get device string for device instance {}", devInst);
+            LOG.log(Level.SEVERE, MessageFormat.format("Couldn't get device string for device instance {0}", devInst));
             return "";
         }
         // Add 1 for null terminator
         int size = ulLen.getValue().intValue() + 1;
         char[] buffer = new char[size];
         if (0 != Cfgmgr32.INSTANCE.CM_Get_Device_ID(devInst, buffer, size, 0)) {
-            LOG.error("Couldn't get device string for device instance {} with size {}", devInst, size);
+            LOG.log(Level.SEVERE, MessageFormat.format("Couldn't get device string for device instance {0} with size {1}",
+                    devInst, size));
             return "";
         }
         return new String(buffer).trim();

@@ -18,13 +18,14 @@
  */
 package oshi.software.os.windows;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.sun.jna.platform.win32.Kernel32;
 import com.sun.jna.platform.win32.WinBase.SYSTEM_INFO;
 import com.sun.jna.platform.win32.WinNT.HANDLE;
 import com.sun.jna.ptr.IntByReference;
+
+import java.text.MessageFormat;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Windows OS native system information.
@@ -32,7 +33,7 @@ import com.sun.jna.ptr.IntByReference;
  * @author dblock[at]dblock[dot]org
  */
 public class WindowsOSSystemInfo {
-    private static final Logger LOG = LoggerFactory.getLogger(WindowsOSSystemInfo.class);
+    private static final Logger LOG = Logger.getLogger(WindowsOSSystemInfo.class.getName());
 
     private SYSTEM_INFO _si = null;
 
@@ -49,11 +50,11 @@ public class WindowsOSSystemInfo {
             }
         } catch (UnsatisfiedLinkError e) {
             // no WOW64 support
-            LOG.trace("", e);
+            LOG.log(Level.FINEST, "", e);
         }
 
         this._si = si;
-        LOG.debug("Initialized OSNativeSystemInfo");
+        LOG.log(Level.FINE, "Initialized OSNativeSystemInfo");
     }
 
     public WindowsOSSystemInfo(SYSTEM_INFO si) {

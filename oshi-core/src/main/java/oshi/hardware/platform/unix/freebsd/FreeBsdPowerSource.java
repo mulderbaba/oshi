@@ -18,12 +18,12 @@
  */
 package oshi.hardware.platform.unix.freebsd;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import oshi.hardware.PowerSource;
 import oshi.hardware.common.AbstractPowerSource;
 import oshi.util.platform.unix.freebsd.BsdSysctlUtil;
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * A Power Source
@@ -34,11 +34,11 @@ public class FreeBsdPowerSource extends AbstractPowerSource {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Logger LOG = LoggerFactory.getLogger(FreeBsdPowerSource.class);
+    private static final Logger LOG = Logger.getLogger(FreeBsdPowerSource.class.getName());
 
     public FreeBsdPowerSource(String newName, double newRemainingCapacity, double newTimeRemaining) {
         super(newName, newRemainingCapacity, newTimeRemaining);
-        LOG.debug("Initialized FreeBsdPowerSource");
+        LOG.log(Level.FINE, "Initialized FreeBsdPowerSource");
     }
 
     /**

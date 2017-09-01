@@ -18,6 +18,7 @@
  */
 package oshi.hardware.platform.mac;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -25,9 +26,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.IntByReference;
@@ -63,7 +63,7 @@ public class MacDisks implements Disks {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Logger LOG = LoggerFactory.getLogger(MacDisks.class);
+    private static final Logger LOG = Logger.getLogger(MacDisks.class.getName());
 
     private static final Map<String, String> mountPointMap = new HashMap<>();
     private static final Map<String, String> logicalVolumeMap = new HashMap<>();
@@ -122,7 +122,7 @@ public class MacDisks implements Disks {
         // Open a DiskArbitration session
         DASessionRef session = DiskArbitration.INSTANCE.DASessionCreate(CfUtil.ALLOCATOR);
         if (session == null) {
-            LOG.error("Unable to open session to DiskArbitration framework.");
+            LOG.log(Level.SEVERE, "Unable to open session to DiskArbitration framework.");
             return new HWDiskStore[0];
         }
 
@@ -269,7 +269,8 @@ public class MacDisks implements Disks {
                             } else {
                                 // This is normal for FileVault drives, Fusion
                                 // drives, and other virtual bsd names
-                                LOG.debug("Unable to find block storage driver properties for {}", bsdName);
+                                LOG.log(Level.SEVERE, MessageFormat.format("Unable to find block storage driver " +
+                                        "properties for {0}", bsdName));
                             }
                             // Now get partitions for this disk.
                             List<HWPartition> partitions = new ArrayList<>();
@@ -354,13 +355,14 @@ public class MacDisks implements Disks {
                                 IOKit.INSTANCE.IOObjectRelease(serviceIterator.getValue());
 
                             } else {
-                                LOG.error("Unable to find properties for {}", bsdName);
+                                LOG.log(Level.SEVERE, MessageFormat.format("Unable to find properties for {0}",
+                                        bsdName));
                             }
                             Collections.sort(partitions);
                             diskStore.setPartitions(partitions.toArray(new HWPartition[partitions.size()]));
                             IOKit.INSTANCE.IOObjectRelease(parent.getValue());
                         } else {
-                            LOG.error("Unable to find IOMedia device or parent for ", bsdName);
+                            LOG.log(Level.SEVERE, "Unable to find IOMedia device or parent for ", bsdName);
                         }
                         IOKit.INSTANCE.IOObjectRelease(drive);
                     }

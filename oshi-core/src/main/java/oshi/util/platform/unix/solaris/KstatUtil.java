@@ -18,11 +18,11 @@
  */
 package oshi.util.platform.unix.solaris;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;
@@ -40,7 +40,7 @@ import oshi.util.Util;
  * @author widdis[at]gmail[dot]com
  */
 public class KstatUtil {
-    private static final Logger LOG = LoggerFactory.getLogger(KstatUtil.class);
+    private static final Logger LOG = Logger.getLogger(KstatUtil.class.getName());
 
     private static KstatCtl kc = LibKstat.INSTANCE.kstat_open();
 
@@ -76,7 +76,7 @@ public class KstatUtil {
         }
         Pointer p = LibKstat.INSTANCE.kstat_data_lookup(ksp, name);
         if (p == null) {
-            LOG.error("Failed lo lookup kstat value for key {}", name);
+            LOG.log(Level.SEVERE, MessageFormat.format("Failed lo lookup kstat value for key {0}", name));
             return "";
         }
         KstatNamed data = new KstatNamed(p);
@@ -94,7 +94,7 @@ public class KstatUtil {
         case LibKstat.KSTAT_DATA_STRING:
             return data.value.str.addr.getString(0);
         default:
-            LOG.error("Unimplemented kstat data type {}", data.data_type);
+            LOG.log(Level.SEVERE, MessageFormat.format("Unimplemented kstat data type {0}", data.data_type));
             return "";
         }
     }
@@ -120,8 +120,11 @@ public class KstatUtil {
         }
         Pointer p = LibKstat.INSTANCE.kstat_data_lookup(ksp, name);
         if (p == null) {
-            LOG.error("Failed lo lookup kstat value on {}:{}:{} for key {}", new String(ksp.ks_module).trim(),
-                    ksp.ks_instance, new String(ksp.ks_name).trim(), name);
+            LOG.log(Level.SEVERE, MessageFormat.format("Failed lo lookup kstat value on {0}:{1}:{2} for key {3}",
+                    new String(ksp.ks_module).trim(),
+                    ksp.ks_instance,
+                    new String(ksp.ks_name).trim(),
+                    name));
             return 0L;
         }
         KstatNamed data = new KstatNamed(p);
@@ -135,7 +138,7 @@ public class KstatUtil {
         case LibKstat.KSTAT_DATA_UINT64:
             return data.value.ui64;
         default:
-            LOG.error("Unimplemented or non-numeric kstat data type {}", data.data_type);
+            LOG.log(Level.SEVERE, MessageFormat.format("Unimplemented or non-numeric kstat data type {0}", data.data_type));
             return 0L;
         }
     }
@@ -156,8 +159,10 @@ public class KstatUtil {
         int retry = 0;
         while (0 > LibKstat.INSTANCE.kstat_read(kc, ksp, null)) {
             if (LibKstat.EAGAIN != Native.getLastError() || 5 <= ++retry) {
-                LOG.error("Failed to read kstat {}:{}:{}", new String(ksp.ks_module).trim(), ksp.ks_instance,
-                        new String(ksp.ks_name).trim());
+                LOG.log(Level.SEVERE, MessageFormat.format("Failed to read kstat {0}:{1}:{2}",
+                        new String(ksp.ks_module).trim(),
+                        ksp.ks_instance,
+                        new String(ksp.ks_name).trim()));
                 return false;
             }
             Util.sleep(8 << retry);
@@ -184,7 +189,7 @@ public class KstatUtil {
     public static Kstat kstatLookup(String module, int instance, String name) {
         int ret = LibKstat.INSTANCE.kstat_chain_update(kc);
         if (ret < 0) {
-            LOG.error("Failed to update kstat chain");
+            LOG.log(Level.SEVERE, "Failed to update kstat chain");
             return null;
         }
         return LibKstat.INSTANCE.kstat_lookup(kc, module, instance, name);
@@ -210,7 +215,7 @@ public class KstatUtil {
         List<Kstat> kstats = new ArrayList<>();
         int ret = LibKstat.INSTANCE.kstat_chain_update(kc);
         if (ret < 0) {
-            LOG.error("Failed to update kstat chain");
+            LOG.log(Level.SEVERE, "Failed to update kstat chain");
             return kstats;
         }
         for (Kstat ksp = LibKstat.INSTANCE.kstat_lookup(kc, module, instance, name); ksp != null; ksp = ksp.next()) {

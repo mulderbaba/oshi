@@ -20,9 +20,8 @@ package oshi.hardware.platform.mac;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.IntByReference;
@@ -45,11 +44,11 @@ public class MacPowerSource extends AbstractPowerSource {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Logger LOG = LoggerFactory.getLogger(MacPowerSource.class);
+    private static final Logger LOG = Logger.getLogger(MacPowerSource.class.getName());
 
     public MacPowerSource(String newName, double newRemainingCapacity, double newTimeRemaining) {
         super(newName, newRemainingCapacity, newTimeRemaining);
-        LOG.debug("Initialized MacPowerSource");
+        LOG.log(Level.FINE, "Initialized MacPowerSource");
     }
 
     /**

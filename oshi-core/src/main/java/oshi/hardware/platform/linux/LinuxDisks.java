@@ -22,9 +22,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import oshi.hardware.Disks;
 import oshi.hardware.HWDiskStore;
@@ -43,7 +42,7 @@ public class LinuxDisks implements Disks {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Logger LOG = LoggerFactory.getLogger(LinuxDisks.class);
+    private static final Logger LOG = Logger.getLogger(LinuxDisks.class.getName());
 
     private static final int SECTORSIZE = 512;
 
@@ -116,7 +115,7 @@ public class LinuxDisks implements Disks {
                 }
                 entry = Udev.INSTANCE.udev_list_entry_get_next(oldEntry);
             } catch (NullPointerException ex) { // NOSONAR squid:S1166
-                LOG.debug("Reached all disks. Exiting ");
+                LOG.log(Level.FINE, "Reached all disks. Exiting ");
                 break;
             } finally {
                 Udev.INSTANCE.udev_device_unref(device);

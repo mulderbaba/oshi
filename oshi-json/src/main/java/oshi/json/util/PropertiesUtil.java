@@ -20,10 +20,10 @@ package oshi.json.util;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.MessageFormat;
 import java.util.Properties;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import oshi.util.ParseUtil;
 
@@ -33,7 +33,7 @@ import oshi.util.ParseUtil;
  * @author widdis[at]gmail[dot]com
  */
 public class PropertiesUtil {
-    private static final Logger LOG = LoggerFactory.getLogger(PropertiesUtil.class);
+    private static final Logger LOG = Logger.getLogger(PropertiesUtil.class.getName());
 
     private PropertiesUtil() {
     }
@@ -53,13 +53,13 @@ public class PropertiesUtil {
         }
         try (InputStream input = loader.getResourceAsStream(propertiesFile)) {
             if (input == null) {
-                LOG.error("No properties file {} on the classpath.", propertiesFile);
+                LOG.log(Level.SEVERE, MessageFormat.format("No properties file {0} on the classpath.", propertiesFile));
                 return props;
             }
             props.load(input);
-            LOG.debug("Loaded properties: {}", props);
+            LOG.log(Level.FINE, MessageFormat.format("Loaded properties: {0}", props));
         } catch (IOException ex) {
-            LOG.error("Error reading properties file {}. {}", propertiesFile, ex);
+            LOG.log(Level.SEVERE, MessageFormat.format("Error reading properties file {0}. {1}", propertiesFile, ex));
         }
         return props;
     }
@@ -125,8 +125,9 @@ public class PropertiesUtil {
             try {
                 return Enum.valueOf(enumClass, s.trim().toUpperCase());
             } catch (IllegalArgumentException ex) {
-                LOG.error("Property value {} from property {} does not match enum class {}. {}", s, property,
-                        enumClass.getName(), ex);
+                LOG.log(Level.SEVERE, MessageFormat.format("Property value {0} from property {1} " +
+                                "does not match enum class {2}. {3}", s, property,
+                        enumClass.getName(), ex));
             }
         }
         return null;

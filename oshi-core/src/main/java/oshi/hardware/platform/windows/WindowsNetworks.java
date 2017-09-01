@@ -18,9 +18,6 @@
  */
 package oshi.hardware.platform.windows;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.sun.jna.platform.win32.Kernel32;
 import com.sun.jna.platform.win32.WinDef.ULONG;
 import com.sun.jna.platform.win32.WinNT.OSVERSIONINFO;
@@ -31,6 +28,10 @@ import oshi.jna.platform.windows.IPHlpAPI;
 import oshi.jna.platform.windows.IPHlpAPI.MIB_IFROW;
 import oshi.jna.platform.windows.IPHlpAPI.MIB_IFROW2;
 
+import java.text.MessageFormat;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  * @author widdis[at]gmail[dot]com
  */
@@ -38,7 +39,7 @@ public class WindowsNetworks extends AbstractNetworks {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Logger LOG = LoggerFactory.getLogger(WindowsNetworks.class);
+    private static final Logger LOG = Logger.getLogger(WindowsNetworks.class.getName());
 
     // Save Windows version info for 32 bit/64 bit branch later
     private static final byte majorVersion;
@@ -68,8 +69,8 @@ public class WindowsNetworks extends AbstractNetworks {
             ifRow.InterfaceIndex = new ULONG(netIF.getNetworkInterface().getIndex());
             if (0 != IPHlpAPI.INSTANCE.GetIfEntry2(ifRow)) {
                 // Error, abort
-                LOG.error("Failed to retrieve data for interface {}, {}", netIF.getNetworkInterface().getIndex(),
-                        netIF.getName());
+                LOG.log(Level.SEVERE, MessageFormat.format("Failed to retrieve data for interface {0}, {1}", netIF.getNetworkInterface().getIndex(),
+                        netIF.getName()));
                 return;
             }
             netIF.setBytesSent(ifRow.OutOctets);
@@ -85,8 +86,8 @@ public class WindowsNetworks extends AbstractNetworks {
             ifRow.dwIndex = netIF.getNetworkInterface().getIndex();
             if (0 != IPHlpAPI.INSTANCE.GetIfEntry(ifRow)) {
                 // Error, abort
-                LOG.error("Failed to retrieve data for interface {}, {}", netIF.getNetworkInterface().getIndex(),
-                        netIF.getName());
+                LOG.log(Level.SEVERE, MessageFormat.format("Failed to retrieve data for interface {0}, {1}", netIF.getNetworkInterface().getIndex(),
+                        netIF.getName()));
                 return;
             }
             netIF.setBytesSent(ifRow.dwOutOctets);

@@ -18,11 +18,11 @@
  */
 package oshi.hardware.platform.linux;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import oshi.hardware.Display;
 import oshi.hardware.common.AbstractDisplay;
@@ -39,11 +39,11 @@ public class LinuxDisplay extends AbstractDisplay {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Logger LOG = LoggerFactory.getLogger(LinuxDisplay.class);
+    private static final Logger LOG = Logger.getLogger(LinuxDisplay.class.getName());
 
     public LinuxDisplay(byte[] edid) {
         super(edid);
-        LOG.debug("Initialized LinuxDisplay");
+        LOG.log(Level.FINE, "Initialized LinuxDisplay");
     }
 
     /**
@@ -69,7 +69,7 @@ public class LinuxDisplay extends AbstractDisplay {
                     continue;
                 }
                 String edidStr = sb.toString();
-                LOG.debug("Parsed EDID: {}", edidStr);
+                LOG.log(Level.FINE, MessageFormat.format("Parsed EDID: {0}", edidStr));
                 byte[] edid = ParseUtil.hexStringToByteArray(edidStr);
                 if (edid.length >= 128) {
                     displays.add(new SolarisDisplay(edid));

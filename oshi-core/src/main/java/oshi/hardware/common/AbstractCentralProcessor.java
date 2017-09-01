@@ -19,11 +19,11 @@
 package oshi.hardware.common;
 
 import java.lang.management.ManagementFactory;
+import java.text.MessageFormat;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import oshi.hardware.CentralProcessor;
 import oshi.util.ParseUtil;
@@ -40,7 +40,7 @@ public abstract class AbstractCentralProcessor implements CentralProcessor {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Logger LOG = LoggerFactory.getLogger(AbstractCentralProcessor.class);
+    private static final Logger LOG = Logger.getLogger(AbstractCentralProcessor.class.getName());
 
     /**
      * Instantiate an OperatingSystemMXBean for future convenience
@@ -123,10 +123,10 @@ public abstract class AbstractCentralProcessor implements CentralProcessor {
             this.lastCpuLoad = ((com.sun.management.OperatingSystemMXBean) OS_MXBEAN).getSystemCpuLoad();
             this.lastCpuLoadTime = System.currentTimeMillis();
             this.sunMXBean = true;
-            LOG.debug("Oracle MXBean detected.");
+            LOG.log(Level.FINE, "Oracle MXBean detected.");
         } catch (ClassNotFoundException e) {
-            LOG.debug("Oracle MXBean not detected.");
-            LOG.trace("", e);
+            LOG.log(Level.FINE, "Oracle MXBean not detected.");
+            LOG.log(Level.FINEST, "", e);
         }
     }
 
@@ -377,7 +377,7 @@ public abstract class AbstractCentralProcessor implements CentralProcessor {
     public synchronized double getSystemCpuLoadBetweenTicks() {
         // Check if > ~ 0.95 seconds since last tick count.
         long now = System.currentTimeMillis();
-        LOG.trace("Current time: {}  Last tick time: {}", now, this.tickTime);
+        LOG.log(Level.FINEST, MessageFormat.format("Current time: {0}  Last tick time: {1}", now, this.tickTime));
         if (now - this.tickTime > 950) {
             // Enough time has elapsed.
             updateSystemTicks();
@@ -390,7 +390,7 @@ public abstract class AbstractCentralProcessor implements CentralProcessor {
         // Calculate idle from difference in idle and IOwait
         long idle = this.curTicks[TickType.IDLE.getIndex()] + this.curTicks[TickType.IOWAIT.getIndex()]
                 - this.prevTicks[TickType.IDLE.getIndex()] - this.prevTicks[TickType.IOWAIT.getIndex()];
-        LOG.trace("Total ticks: {}  Idle ticks: {}", total, idle);
+        LOG.log(Level.FINEST, MessageFormat.format("Total ticks: {0}  Idle ticks: {1}", total, idle));
 
         return total > 0 && idle >= 0 ? (double) (total - idle) / total : 0d;
     }
@@ -403,7 +403,7 @@ public abstract class AbstractCentralProcessor implements CentralProcessor {
      * time interval, CPU load over that interval may be calculated.
      */
     protected void updateSystemTicks() {
-        LOG.trace("Updating System Ticks");
+        LOG.log(Level.FINEST, "Updating System Ticks");
         long[] ticks = getSystemCpuLoadTicks();
         // Skip update if ticks is all zero.
         // Iterate to find a nonzero tick value and return; this should quickly
@@ -454,7 +454,7 @@ public abstract class AbstractCentralProcessor implements CentralProcessor {
     public double[] getProcessorCpuLoadBetweenTicks() {
         // Check if > ~ 0.95 seconds since last tick count.
         long now = System.currentTimeMillis();
-        LOG.trace("Current time: {}  Last tick time: {}", now, this.procTickTime);
+        LOG.log(Level.FINEST, MessageFormat.format("Current time: {0}  Last tick time: {1}", now, this.procTickTime));
         if (now - this.procTickTime > 950) {
             // Enough time has elapsed.
             // Update latest
@@ -471,7 +471,7 @@ public abstract class AbstractCentralProcessor implements CentralProcessor {
                     + this.curProcTicks[cpu][TickType.IOWAIT.getIndex()]
                     - this.prevProcTicks[cpu][TickType.IDLE.getIndex()]
                     - this.prevProcTicks[cpu][TickType.IOWAIT.getIndex()];
-            LOG.trace("CPU: {}  Total ticks: {}  Idle ticks: {}", cpu, total, idle);
+            LOG.log(Level.FINEST, MessageFormat.format("CPU: {0}  Total ticks: {1}  Idle ticks: {2}", cpu, total, idle));
             // update
             load[cpu] = total > 0 && idle >= 0 ? (double) (total - idle) / total : 0d;
         }
@@ -487,7 +487,7 @@ public abstract class AbstractCentralProcessor implements CentralProcessor {
      * interval may be calculated.
      */
     protected void updateProcessorTicks() {
-        LOG.trace("Updating Processor Ticks");
+        LOG.log(Level.FINEST, "Updating Processor Ticks");
         long[][] ticks = getProcessorCpuLoadTicks();
         // Skip update if ticks is all zero.
         // Iterate to find a nonzero tick value and return; this should quickly

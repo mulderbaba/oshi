@@ -18,12 +18,12 @@
  */
 package oshi.software.os.windows;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.sun.jna.Memory;
 import com.sun.jna.platform.win32.Kernel32;
@@ -40,7 +40,7 @@ public class WindowsNetworkParams extends AbstractNetworkParams {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Logger LOG = LoggerFactory.getLogger(WindowsNetworkParams.class);
+    private static final Logger LOG = Logger.getLogger(WindowsNetworkParams.class.getName());
 
     private static final WmiUtil.ValueType[] GATEWAY_TYPES = { WmiUtil.ValueType.STRING, WmiUtil.ValueType.UINT16 };
     private static final String IPV4_DEFAULT_DEST = "0.0.0.0/0";
@@ -56,7 +56,8 @@ public class WindowsNetworkParams extends AbstractNetworkParams {
         char[] buffer = new char[256];
         IntByReference bufferSize = new IntByReference(buffer.length);
         if (!Kernel32.INSTANCE.GetComputerNameEx(COMPUTER_NAME_DNS_DOMAIN_FULLY_QUALIFIED, buffer, bufferSize)) {
-            LOG.error("Failed to get dns domain name. Error code: {}", Kernel32.INSTANCE.GetLastError());
+            LOG.log(Level.SEVERE, MessageFormat.format("Failed to get dns domain name. Error code: {0}",
+                    Kernel32.INSTANCE.GetLastError()));
             return "";
         }
         return new String(buffer).trim();
@@ -75,14 +76,14 @@ public class WindowsNetworkParams extends AbstractNetworkParams {
         WinDef.ULONGByReference bufferSize = new WinDef.ULONGByReference();
         int ret = IPHlpAPI.INSTANCE.GetNetworkParams(null, bufferSize);
         if (ret != IPHlpAPI.ERROR_BUFFER_OVERFLOW) {
-            LOG.error("Failed to get network parameters buffer size. Error code: {}", ret);
+            LOG.log(Level.SEVERE, MessageFormat.format("Failed to get network parameters buffer size. Error code: {0}", ret));
             return new String[0];
         }
 
         FIXED_INFO buffer = new FIXED_INFO(new Memory(bufferSize.getValue().longValue()));
         ret = IPHlpAPI.INSTANCE.GetNetworkParams(buffer, bufferSize);
         if (ret != 0) {
-            LOG.error("Failed to get network parameters. Error code: {}", ret);
+            LOG.log(Level.SEVERE, MessageFormat.format("Failed to get network parameters. Error code: {0}", ret));
             return new String[0];
         }
 

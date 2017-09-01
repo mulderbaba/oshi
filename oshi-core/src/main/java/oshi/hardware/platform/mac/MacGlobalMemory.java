@@ -18,9 +18,6 @@
  */
 package oshi.hardware.platform.mac;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.sun.jna.Native;
 import com.sun.jna.platform.mac.SystemB;
 import com.sun.jna.platform.mac.SystemB.VMStatistics;
@@ -31,6 +28,9 @@ import oshi.hardware.common.AbstractGlobalMemory;
 import oshi.jna.platform.mac.SystemB.XswUsage;
 import oshi.util.platform.mac.SysctlUtil;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  * Memory obtained by host_statistics (vm_stat) and sysctl
  *
@@ -40,7 +40,7 @@ public class MacGlobalMemory extends AbstractGlobalMemory {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Logger LOG = LoggerFactory.getLogger(MacGlobalMemory.class);
+    private static final Logger LOG = Logger.getLogger(MacGlobalMemory.class.getName());
 
     private transient XswUsage xswUsage = new XswUsage();
     private long lastUpdateSwap = 0;
@@ -58,7 +58,7 @@ public class MacGlobalMemory extends AbstractGlobalMemory {
 
         LongByReference pPageSize = new LongByReference();
         if (0 != SystemB.INSTANCE.host_page_size(SystemB.INSTANCE.mach_host_self(), pPageSize)) {
-            LOG.error("Failed to get host page size. Error code: " + Native.getLastError());
+            LOG.log(Level.SEVERE, "Failed to get host page size. Error code: " + Native.getLastError());
             return;
         }
         this.pageSize = pPageSize.getValue();
@@ -73,7 +73,7 @@ public class MacGlobalMemory extends AbstractGlobalMemory {
         if (now - this.lastUpdateAvail > 100) {
             if (0 != SystemB.INSTANCE.host_statistics(SystemB.INSTANCE.mach_host_self(), SystemB.HOST_VM_INFO,
                     this.vmStats, new IntByReference(this.vmStats.size() / SystemB.INT_SIZE))) {
-                LOG.error("Failed to get host VM info. Error code: " + Native.getLastError());
+                LOG.log(Level.SEVERE, "Failed to get host VM info. Error code: " + Native.getLastError());
                 return;
             }
             this.memAvailable = (this.vmStats.free_count + this.vmStats.inactive_count) * this.pageSize;

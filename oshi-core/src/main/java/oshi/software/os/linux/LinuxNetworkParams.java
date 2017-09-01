@@ -20,10 +20,10 @@ package oshi.software.os.linux;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.text.MessageFormat;
 import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.sun.jna.ptr.PointerByReference;
 
@@ -36,7 +36,7 @@ public class LinuxNetworkParams extends AbstractNetworkParams {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Logger LOG = LoggerFactory.getLogger(LinuxNetworkParams.class);
+    private static final Logger LOG = Logger.getLogger(LinuxNetworkParams.class.getName());
 
     private static final String IPV4_DEFAULT_DEST = "0.0.0.0";
     private static final String IPV6_DEFAULT_DEST = "::/0";
@@ -52,13 +52,13 @@ public class LinuxNetworkParams extends AbstractNetworkParams {
         try {
             hostname = InetAddress.getLocalHost().getHostName();
         } catch (UnknownHostException e) {
-            LOG.error("Unknown host exception when getting address of local host: {}", e);
+            LOG.log(Level.SEVERE, MessageFormat.format("Unknown host exception when getting address of local host: {0}", e));
             return "";
         }
         PointerByReference ptr = new PointerByReference();
         int res = Libc.INSTANCE.getaddrinfo(hostname, null, hint, ptr);
         if (res > 0) {
-            LOG.error("Failed getaddrinfo(): {}", Libc.INSTANCE.gai_strerror(res));
+            LOG.log(Level.SEVERE, MessageFormat.format("Failed getaddrinfo(): {0}", Libc.INSTANCE.gai_strerror(res)));
             return "";
         }
         Libc.Addrinfo info = new Libc.Addrinfo(ptr.getValue());

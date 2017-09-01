@@ -23,13 +23,13 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * File reading methods
@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
  * @author widdis[at]gmail[dot]com
  */
 public class FileUtil {
-    private static final Logger LOG = LoggerFactory.getLogger(FileUtil.class);
+    private static final Logger LOG = Logger.getLogger(FileUtil.class.getName());
 
     private FileUtil() {
     }
@@ -70,16 +70,16 @@ public class FileUtil {
      */
     public static List<String> readFile(String filename, boolean reportError) {
         if (new File(filename).exists()) {
-            LOG.debug("Reading file {}", filename);
+            LOG.log(Level.FINE, MessageFormat.format("Reading file {0}", filename));
             try {
                 return Files.readAllLines(Paths.get(filename), StandardCharsets.UTF_8);
             } catch (IOException e) {
                 if (reportError) {
-                    LOG.error("Error reading file {}. {}", filename, e);
+                    LOG.log(Level.SEVERE, MessageFormat.format("Error reading file {0}. {1}", filename, e));
                 }
             }
         } else if (reportError) {
-            LOG.warn("File not found: {}", filename);
+            LOG.log(Level.WARNING, MessageFormat.format("File not found: {0}", filename));
         }
         return new ArrayList<>();
     }
@@ -93,10 +93,10 @@ public class FileUtil {
      * @return The value contained in the file, if any; otherwise zero
      */
     public static long getLongFromFile(String filename) {
-        LOG.debug("Reading file {}", filename);
+        LOG.log(Level.FINE, MessageFormat.format("Reading file {0}", filename));
         List<String> read = FileUtil.readFile(filename, false);
         if (!read.isEmpty()) {
-            LOG.trace("Read {}", read.get(0));
+            LOG.log(Level.FINEST, MessageFormat.format("Read {0}", read.get(0)));
             return ParseUtil.parseLongOrDefault(read.get(0), 0L);
         }
         return 0L;
@@ -111,15 +111,15 @@ public class FileUtil {
      * @return The value contained in the file, if any; otherwise zero
      */
     public static int getIntFromFile(String filename) {
-        LOG.debug("Reading file {}", filename);
+        LOG.log(Level.FINE, MessageFormat.format("Reading file {0}", filename));
         try {
             List<String> read = FileUtil.readFile(filename, false);
             if (!read.isEmpty()) {
-                LOG.trace("Read {}", read.get(0));
+                LOG.log(Level.FINEST, MessageFormat.format("Read {0}", read.get(0)));
                 return Integer.parseInt(read.get(0));
             }
         } catch (NumberFormatException ex) {
-            LOG.debug("Unable to read value from {}. {}", filename, ex);
+            LOG.log(Level.FINE, MessageFormat.format("Unable to read value from {0}. {1}", filename, ex));
         }
         return 0;
     }
@@ -133,10 +133,10 @@ public class FileUtil {
      * @return The value contained in the file, if any; otherwise empty string
      */
     public static String getStringFromFile(String filename) {
-        LOG.debug("Reading file {}", filename);
+        LOG.log(Level.FINE, MessageFormat.format("Reading file {0}", filename));
         List<String> read = FileUtil.readFile(filename, false);
         if (!read.isEmpty()) {
-            LOG.trace("Read {}", read.get(0));
+            LOG.log(Level.FINEST, MessageFormat.format("Read {0}", read.get(0)));
             return read.get(0);
         }
         return "";
@@ -151,10 +151,10 @@ public class FileUtil {
      * @return An array of strings containing delimited values
      */
     public static String[] getSplitFromFile(String filename) {
-        LOG.debug("Reading file {}", filename);
+        LOG.log(Level.FINE, MessageFormat.format("Reading file {0}", filename));
         List<String> read = FileUtil.readFile(filename, false);
         if (!read.isEmpty()) {
-            LOG.trace("Read {}", read.get(0));
+            LOG.log(Level.FINEST, MessageFormat.format("Read {0}", read.get(0)));
             return read.get(0).split("\\s+");
         }
         return new String[0];
@@ -173,7 +173,7 @@ public class FileUtil {
      */
     public static Map<String, String> getKeyValueMapFromFile(String filename, String separator) {
         Map<String, String> map = new HashMap<>();
-        LOG.debug("Reading file {}", filename);
+        LOG.log(Level.FINE, MessageFormat.format("Reading file {0}", filename));
         List<String> lines = FileUtil.readFile(filename, false);
         for (String line : lines) {
             String[] parts = line.split(separator);

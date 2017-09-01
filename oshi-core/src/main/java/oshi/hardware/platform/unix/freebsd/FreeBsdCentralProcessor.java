@@ -18,12 +18,12 @@
  */
 package oshi.hardware.platform.unix.freebsd;
 
+import java.text.MessageFormat;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.sun.jna.Memory;
 import com.sun.jna.Native;
@@ -48,7 +48,7 @@ public class FreeBsdCentralProcessor extends AbstractCentralProcessor {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Logger LOG = LoggerFactory.getLogger(FreeBsdCentralProcessor.class);
+    private static final Logger LOG = Logger.getLogger(FreeBsdCentralProcessor.class.getName());
 
     private static final Pattern CPUMASK = Pattern.compile(".*<cpu\\s.*mask=\"(?:0x)?(\\p{XDigit}+)\".*>.*</cpu>.*");
 
@@ -83,7 +83,7 @@ public class FreeBsdCentralProcessor extends AbstractCentralProcessor {
         // Initialize tick arrays
         initTicks();
 
-        LOG.debug("Initialized Processor");
+        LOG.log(Level.FINE, "Initialized Processor");
     }
 
     private void initVars() {
@@ -149,11 +149,11 @@ public class FreeBsdCentralProcessor extends AbstractCentralProcessor {
         this.physicalProcessorCount = Long.bitCount(physMask);
 
         if (this.logicalProcessorCount < 1) {
-            LOG.error("Couldn't find logical processor count. Assuming 1.");
+            LOG.log(Level.SEVERE, "Couldn't find logical processor count. Assuming 1.");
             this.logicalProcessorCount = 1;
         }
         if (this.physicalProcessorCount < 1) {
-            LOG.error("Couldn't find physical processor count. Assuming 1.");
+            LOG.log(Level.SEVERE, "Couldn't find physical processor count. Assuming 1.");
             this.physicalProcessorCount = 1;
         }
     }
@@ -206,7 +206,7 @@ public class FreeBsdCentralProcessor extends AbstractCentralProcessor {
         String name = "kern.cp_times";
         // Fetch
         if (0 != Libc.INSTANCE.sysctlbyname(name, p, new IntByReference(size), null, 0)) {
-            LOG.error("Failed syctl call: {}, Error code: {}", name, Native.getLastError());
+            LOG.log(Level.SEVERE, MessageFormat.format("Failed syctl call: {0}, Error code: {1}", name, Native.getLastError()));
             return ticks;
         }
         // p now points to the data; need to copy each element

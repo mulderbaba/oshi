@@ -18,9 +18,6 @@
  */
 package oshi.hardware.platform.mac;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.sun.jna.Native;
 import com.sun.jna.platform.mac.SystemB.HostCpuLoadInfo;
 import com.sun.jna.ptr.IntByReference;
@@ -34,6 +31,9 @@ import oshi.util.FormatUtil;
 import oshi.util.ParseUtil;
 import oshi.util.platform.mac.SysctlUtil;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  * A CPU.
  *
@@ -45,7 +45,7 @@ public class MacCentralProcessor extends AbstractCentralProcessor {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Logger LOG = LoggerFactory.getLogger(MacCentralProcessor.class);
+    private static final Logger LOG = Logger.getLogger(MacCentralProcessor.class.getName());
 
     private static final long BOOTTIME;
     static {
@@ -74,7 +74,7 @@ public class MacCentralProcessor extends AbstractCentralProcessor {
         // Initialize tick arrays
         initTicks();
 
-        LOG.debug("Initialized Processor");
+        LOG.log(Level.FINE, "Initialized Processor");
     }
 
     private void initVars() {
@@ -112,7 +112,7 @@ public class MacCentralProcessor extends AbstractCentralProcessor {
         HostCpuLoadInfo cpuLoadInfo = new HostCpuLoadInfo();
         if (0 != SystemB.INSTANCE.host_statistics(machPort, SystemB.HOST_CPU_LOAD_INFO, cpuLoadInfo,
                 new IntByReference(cpuLoadInfo.size()))) {
-            LOG.error("Failed to get System CPU ticks. Error code: " + Native.getLastError());
+            LOG.log(Level.SEVERE, "Failed to get System CPU ticks. Error code: " + Native.getLastError());
             return ticks;
         }
 
@@ -156,7 +156,7 @@ public class MacCentralProcessor extends AbstractCentralProcessor {
         IntByReference procInfoCount = new IntByReference();
         if (0 != SystemB.INSTANCE.host_processor_info(machPort, SystemB.PROCESSOR_CPU_LOAD_INFO, procCount,
                 procCpuLoadInfo, procInfoCount)) {
-            LOG.error("Failed to update CPU Load. Error code: " + Native.getLastError());
+            LOG.log(Level.SEVERE, "Failed to update CPU Load. Error code: " + Native.getLastError());
             return ticks;
         }
 

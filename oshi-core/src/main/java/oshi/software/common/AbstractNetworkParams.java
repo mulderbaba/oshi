@@ -22,9 +22,8 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import oshi.software.os.NetworkParams;
 import oshi.util.FileUtil;
@@ -36,7 +35,7 @@ public abstract class AbstractNetworkParams implements NetworkParams {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Logger LOG = LoggerFactory.getLogger(AbstractNetworkParams.class);
+    private static final Logger LOG = Logger.getLogger(AbstractNetworkParams.class.getName());
     private static final String NAMESERVER = "nameserver";
 
     /**
@@ -47,7 +46,7 @@ public abstract class AbstractNetworkParams implements NetworkParams {
         try {
             return InetAddress.getLocalHost().getCanonicalHostName();
         } catch (UnknownHostException e) {
-            LOG.error("Unknown host exception when getting address of local host: " + e);
+            LOG.log(Level.SEVERE, "Unknown host exception when getting address of local host: " + e);
             return "";
         }
     }
@@ -66,7 +65,7 @@ public abstract class AbstractNetworkParams implements NetworkParams {
                 return hn.substring(0, dot);
             }
         } catch (UnknownHostException e) {
-            LOG.error("Unknown host exception when getting address of local host: " + e);
+            LOG.log(Level.SEVERE, "Unknown host exception when getting address of local host: " + e);
             return "";
         }
     }

@@ -20,10 +20,10 @@ package oshi.software.os.mac;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.text.MessageFormat;
 import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.sun.jna.ptr.PointerByReference;
 
@@ -33,7 +33,7 @@ import oshi.util.ExecutingCommand;
 
 public class MacNetworkParams extends AbstractNetworkParams {
 
-    private static final Logger LOG = LoggerFactory.getLogger(MacNetworkParams.class);
+    private static final Logger LOG = Logger.getLogger(MacNetworkParams.class.getName());
 
     private static final long serialVersionUID = 1L;
 
@@ -52,13 +52,14 @@ public class MacNetworkParams extends AbstractNetworkParams {
         try {
             hostname = InetAddress.getLocalHost().getHostName();
         } catch (UnknownHostException e) {
-            LOG.error("Unknown host exception when getting address of local host: {}", e);
+            LOG.log(Level.SEVERE, MessageFormat.format("Unknown host exception when getting address of local host: {0}",
+                    e));
             return "";
         }
         PointerByReference ptr = new PointerByReference();
         int res = SystemB.INSTANCE.getaddrinfo(hostname, null, hint, ptr);
         if (res > 0) {
-            LOG.error("Failed getaddrinfo(): {}", SystemB.INSTANCE.gai_strerror(res));
+            LOG.log(Level.SEVERE, MessageFormat.format("Failed getaddrinfo(): {0}", SystemB.INSTANCE.gai_strerror(res)));
             return "";
         }
         SystemB.Addrinfo info = new SystemB.Addrinfo(ptr.getValue());

@@ -18,9 +18,6 @@
  */
 package oshi.jna.platform.windows.COM;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.sun.jna.NativeLong;
 import com.sun.jna.Pointer;
 import com.sun.jna.platform.win32.Guid.CLSID;
@@ -34,8 +31,11 @@ import com.sun.jna.ptr.PointerByReference;
 
 import oshi.jna.platform.windows.Ole32;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 public class WbemLocator extends Unknown {
-    private static final Logger LOG = LoggerFactory.getLogger(WbemLocator.class);
+    private static final Logger LOG = Logger.getLogger(WbemLocator.class.getName());
 
     public static final CLSID CLSID_WbemLocator = new CLSID("4590f811-1d3a-11d0-891f-00aa004b2e24");
     public static final GUID IID_IWbemLocator = new GUID("dc12a687-737f-11cf-884d-00aa004b2e24");
@@ -50,7 +50,7 @@ public class WbemLocator extends Unknown {
         HRESULT hres = Ole32.INSTANCE.CoCreateInstance(CLSID_WbemLocator, null, WTypes.CLSCTX_INPROC_SERVER,
                 IID_IWbemLocator, pbr);
         if (COMUtils.FAILED(hres)) {
-            LOG.error(String.format("Failed to create WbemLocator object. Error code = 0x%08x", hres.intValue()));
+            LOG.log(Level.SEVERE, String.format("Failed to create WbemLocator object. Error code = 0x%08x", hres.intValue()));
             Ole32.INSTANCE.CoUninitialize();
             return null;
         }

@@ -22,13 +22,13 @@ import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import oshi.SystemInfo;
 import oshi.hardware.platform.linux.LinuxNetworks;
@@ -47,7 +47,7 @@ public class NetworkIF implements Serializable {
 
     private static final long serialVersionUID = 2L;
 
-    private static final Logger LOG = LoggerFactory.getLogger(NetworkIF.class);
+    private static final Logger LOG = Logger.getLogger(NetworkIF.class.getName());
 
     private transient NetworkInterface networkInterface;
     private int mtu;
@@ -108,7 +108,7 @@ public class NetworkIF implements Serializable {
             this.ipv4 = ipv4list.toArray(new String[ipv4list.size()]);
             this.ipv6 = ipv6list.toArray(new String[ipv6list.size()]);
         } catch (SocketException e) {
-            LOG.error("Socket exception: {}", e);
+            LOG.log(Level.SEVERE, MessageFormat.format("Socket exception: {0}", e));
             return;
         }
     }
@@ -323,7 +323,7 @@ public class NetworkIF implements Serializable {
             FreeBsdNetworks.updateNetworkStats(this);
             break;
         default:
-            LOG.error("Unsupported platform. No update performed.");
+            LOG.log(Level.SEVERE, "Unsupported platform. No update performed.");
             break;
         }
     }

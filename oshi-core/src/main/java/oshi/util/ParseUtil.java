@@ -18,15 +18,16 @@
  */
 package oshi.util;
 
+import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.threeten.bp.LocalTime;
 import org.threeten.bp.OffsetDateTime;
 import org.threeten.bp.format.DateTimeFormatter;
@@ -39,9 +40,9 @@ import org.threeten.bp.format.DateTimeParseException;
  */
 public class ParseUtil {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ParseUtil.class);
+    private static final Logger LOG = Logger.getLogger(ParseUtil.class.getName());
 
-    private static final String DEFAULT_LOG_MSG = "{} didn't parse. Returning default. {}";
+    private static final String DEFAULT_LOG_MSG = "{0} didn't parse. Returning default. {1}";
     /*
      * Used for matching
      */
@@ -125,7 +126,7 @@ public class ParseUtil {
         try {
             return Integer.parseInt(parseLastString(s));
         } catch (NumberFormatException e) {
-            LOG.trace(DEFAULT_LOG_MSG, s, e);
+            LOG.log(Level.FINEST, MessageFormat.format(DEFAULT_LOG_MSG, s, e));
             return i;
         }
     }
@@ -158,7 +159,7 @@ public class ParseUtil {
         int len = digits.length();
         // Check if string is valid hex
         if (!VALID_HEX.matcher(digits).matches() || (len & 0x1) != 0) {
-            LOG.warn("Invalid hexadecimal string: {}", digits);
+            LOG.log(Level.WARNING, MessageFormat.format("Invalid hexadecimal string: {0}", digits));
             return new byte[0];
         }
         byte[] data = new byte[len / 2];
@@ -286,7 +287,7 @@ public class ParseUtil {
         } catch (IndexOutOfBoundsException // if cimDate not 22+ chars
                 | NumberFormatException // if TZ minutes doesn't parse
                 | DateTimeParseException e) {
-            LOG.trace(DEFAULT_LOG_MSG, cimDate, e);
+            LOG.log(Level.FINEST, MessageFormat.format(DEFAULT_LOG_MSG, cimDate, e));
             return 0L;
         }
     }
@@ -316,7 +317,7 @@ public class ParseUtil {
                 sb.append((char) charAsInt);
             }
         } catch (NumberFormatException e) {
-            LOG.trace(DEFAULT_LOG_MSG, hexString, e);
+            LOG.log(Level.FINEST, MessageFormat.format(DEFAULT_LOG_MSG, hexString, e));
             // Hex failed to parse, just return the existing string
             return hexString;
         }
@@ -336,7 +337,7 @@ public class ParseUtil {
         try {
             return Integer.parseInt(s);
         } catch (NumberFormatException e) {
-            LOG.trace(DEFAULT_LOG_MSG, s, e);
+            LOG.log(Level.FINEST, MessageFormat.format(DEFAULT_LOG_MSG, s, e));
             return defaultInt;
         }
     }
@@ -354,7 +355,7 @@ public class ParseUtil {
         try {
             return Long.parseLong(s);
         } catch (NumberFormatException e) {
-            LOG.trace(DEFAULT_LOG_MSG, s, e);
+            LOG.log(Level.FINEST, MessageFormat.format(DEFAULT_LOG_MSG, s, e));
             return defaultLong;
         }
     }
@@ -372,7 +373,7 @@ public class ParseUtil {
         try {
             return Double.parseDouble(s);
         } catch (NumberFormatException e) {
-            LOG.trace(DEFAULT_LOG_MSG, s, e);
+            LOG.log(Level.FINEST, MessageFormat.format(DEFAULT_LOG_MSG, s, e));
             return defaultDouble;
         }
     }

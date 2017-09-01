@@ -18,13 +18,13 @@
  */
 package oshi.hardware.platform.unix.solaris;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import oshi.hardware.PowerSource;
 import oshi.hardware.common.AbstractPowerSource;
 import oshi.jna.platform.unix.solaris.LibKstat.Kstat;
 import oshi.util.platform.unix.solaris.KstatUtil;
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * A Power Source
@@ -35,7 +35,7 @@ public class SolarisPowerSource extends AbstractPowerSource {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Logger LOG = LoggerFactory.getLogger(SolarisPowerSource.class);
+    private static final Logger LOG = Logger.getLogger(SolarisPowerSource.class.getName());
 
     /*
      * One-time lookup to see which kstat module to use
@@ -56,7 +56,7 @@ public class SolarisPowerSource extends AbstractPowerSource {
 
     public SolarisPowerSource(String newName, double newRemainingCapacity, double newTimeRemaining) {
         super(newName, newRemainingCapacity, newTimeRemaining);
-        LOG.debug("Initialized SolarisPowerSource");
+        LOG.log(Level.FINE, "Initialized SolarisPowerSource");
     }
 
     /**

@@ -18,9 +18,6 @@
  */
 package oshi.hardware.platform.windows;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.sun.jna.NativeLong;
 
 import oshi.hardware.PowerSource;
@@ -28,6 +25,9 @@ import oshi.hardware.common.AbstractPowerSource;
 import oshi.jna.platform.windows.PowrProf;
 import oshi.jna.platform.windows.PowrProf.SystemBatteryState;
 import oshi.util.FormatUtil;
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * A Power Source
@@ -38,11 +38,11 @@ public class WindowsPowerSource extends AbstractPowerSource {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Logger LOG = LoggerFactory.getLogger(WindowsPowerSource.class);
+    private static final Logger LOG = Logger.getLogger(WindowsPowerSource.class.getName());
 
     public WindowsPowerSource(String newName, double newRemainingCapacity, double newTimeRemaining) {
         super(newName, newRemainingCapacity, newTimeRemaining);
-        LOG.debug("Initialized WindowsPowerSource");
+        LOG.log(Level.FINE, "Initialized WindowsPowerSource");
     }
 
     /**

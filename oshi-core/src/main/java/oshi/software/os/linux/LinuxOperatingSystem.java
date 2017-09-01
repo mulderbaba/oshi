@@ -20,14 +20,14 @@ package oshi.software.os.linux;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.sun.jna.Memory;
 import com.sun.jna.Native;
@@ -55,7 +55,7 @@ public class LinuxOperatingSystem extends AbstractOperatingSystem {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Logger LOG = LoggerFactory.getLogger(LinuxOperatingSystem.class);
+    private static final Logger LOG = Logger.getLogger(LinuxOperatingSystem.class.getName());
 
     // Populated with results of reading /etc/os-release or other files
     protected String versionId;
@@ -128,10 +128,10 @@ public class LinuxOperatingSystem extends AbstractOperatingSystem {
                 }
             }
         }
-        LOG.debug("Youngest PID is {} with {} jiffies", youngestPid, youngestJiffies);
+        LOG.log(Level.FINE, MessageFormat.format("Youngest PID is {0} with {1} jiffies", youngestPid, youngestJiffies));
         // Shouldn't happen but avoiding Division by zero
         if (youngestJiffies == 0) {
-            LOG.error("Couldn't find any running processes, which is odd since we are in a running process. "
+            LOG.log(Level.SEVERE, "Couldn't find any running processes, which is odd since we are in a running process. "
                     + "Process time values are in jiffies, not milliseconds.");
             return;
         }
@@ -146,15 +146,15 @@ public class LinuxOperatingSystem extends AbstractOperatingSystem {
         // etime close to 0 in case this command fails; the longer the system
         // has been up, the less impact this assumption will have
         if (!etime.isEmpty()) {
-            LOG.debug("Etime is {} seconds", etime.trim());
+            LOG.log(Level.FINE, "Etime is {0} seconds", etime.trim());
             startTimeSecsSinceBoot -= Float.parseFloat(etime.trim());
         }
         // By subtracting etime (secs) from uptime (secs) we get uptime (in
         // secs) when the process was started. This correlates with startTime in
         // jiffies for this process
-        LOG.debug("Start time in secs: {}", startTimeSecsSinceBoot);
+        LOG.log(Level.FINE, MessageFormat.format("Start time in secs: {0}", startTimeSecsSinceBoot));
         if (startTimeSecsSinceBoot <= 0) {
-            LOG.warn("Couldn't calculate jiffies per second. "
+            LOG.log(Level.WARNING, "Couldn't calculate jiffies per second. "
                     + "Process time values are in jiffies, not milliseconds.");
             return;
         }
@@ -167,7 +167,7 @@ public class LinuxOperatingSystem extends AbstractOperatingSystem {
         try {
             return Libc.INSTANCE.getpagesize();
         } catch (UnsatisfiedLinkError | NoClassDefFoundError e) {
-            LOG.error("Failed to get the memory page size.", e);
+            LOG.log(Level.SEVERE, "Failed to get the memory page size.", e);
         }
         // default to 4K if the above call fails
         return 4096;
@@ -294,12 +294,12 @@ public class LinuxOperatingSystem extends AbstractOperatingSystem {
         try {
             Sysinfo info = new Sysinfo();
             if (0 != Libc.INSTANCE.sysinfo(info)) {
-                LOG.error("Failed to get process thread count. Error code: " + Native.getLastError());
+                LOG.log(Level.SEVERE, "Failed to get process thread count. Error code: " + Native.getLastError());
                 return 0;
             }
             return info.procs;
         } catch (UnsatisfiedLinkError | NoClassDefFoundError e) {
-            LOG.error("Failed to get procs from sysinfo. {}", e);
+            LOG.log(Level.SEVERE, MessageFormat.format("Failed to get procs from sysinfo. {0}", e));
         }
         return 0;
     }
@@ -378,7 +378,7 @@ public class LinuxOperatingSystem extends AbstractOperatingSystem {
             // Search for NAME=
             for (String line : osRelease) {
                 if (line.startsWith("VERSION=")) {
-                    LOG.debug("os-release: {}", line);
+                    LOG.log(Level.FINE, MessageFormat.format("os-release: {0}", line));
                     // remove beginning and ending '"' characters, etc from
                     // VERSION="14.04.4 LTS, Trusty Tahr" (Ubuntu style)
                     // or VERSION="17 (Beefy Miracle)" (os-release doc style)
@@ -395,12 +395,12 @@ public class LinuxOperatingSystem extends AbstractOperatingSystem {
                         this.codeName = split[1].trim();
                     }
                 } else if (line.startsWith("NAME=") && this.family == null) {
-                    LOG.debug("os-release: {}", line);
+                    LOG.log(Level.FINE, MessageFormat.format("os-release: {0}", line));
                     // remove beginning and ending '"' characters, etc from
                     // NAME="Ubuntu"
                     this.family = line.replace("NAME=", "").replaceAll("^\"|\"$", "").trim();
                 } else if (line.startsWith("VERSION_ID=") && this.versionId == null) {
-                    LOG.debug("os-release: {}", line);
+                    LOG.log(Level.FINE, MessageFormat.format("os-release: {0}", line));
                     // remove beginning and ending '"' characters, etc from
                     // VERSION_ID="14.04"
                     this.versionId = line.replace("VERSION_ID=", "").replaceAll("^\"|\"$", "").trim();
@@ -422,19 +422,19 @@ public class LinuxOperatingSystem extends AbstractOperatingSystem {
         // distribution concatenated, e.g., RedHat instead of Red Hat
         for (String line : ExecutingCommand.runNative("lsb_release -a")) {
             if (line.startsWith("Description:")) {
-                LOG.debug("lsb_release -a: {}", line);
+                LOG.log(Level.FINE, MessageFormat.format("lsb_release -a: {0}", line));
                 line = line.replace("Description:", "").trim();
                 if (line.contains(" release ")) {
                     this.family = parseRelease(line, " release ");
                 }
             } else if (line.startsWith("Distributor ID:") && this.family == null) {
-                LOG.debug("lsb_release -a: {}", line);
+                LOG.log(Level.FINE, MessageFormat.format("lsb_release -a: {0}", line));
                 this.family = line.replace("Distributor ID:", "").trim();
             } else if (line.startsWith("Release:") && this.versionId == null) {
-                LOG.debug("lsb_release -a: {}", line);
+                LOG.log(Level.FINE, MessageFormat.format("lsb_release -a: {0}", line));
                 this.versionId = line.replace("Release:", "").trim();
             } else if (line.startsWith("Codename:") && this.codeName == null) {
-                LOG.debug("lsb_release -a: {}", line);
+                LOG.log(Level.FINE, MessageFormat.format("lsb_release -a: {0}", line));
                 this.codeName = line.replace("Codename:", "").trim();
             }
         }
@@ -453,19 +453,19 @@ public class LinuxOperatingSystem extends AbstractOperatingSystem {
             // Search for NAME=
             for (String line : osRelease) {
                 if (line.startsWith("DISTRIB_DESCRIPTION=")) {
-                    LOG.debug("lsb-release: {}", line);
+                    LOG.log(Level.FINE, MessageFormat.format("lsb-release: {0}", line));
                     line = line.replace("DISTRIB_DESCRIPTION=", "").replaceAll("^\"|\"$", "").trim();
                     if (line.contains(" release ")) {
                         this.family = parseRelease(line, " release ");
                     }
                 } else if (line.startsWith("DISTRIB_ID=") && this.family == null) {
-                    LOG.debug("lsb-release: {}", line);
+                    LOG.log(Level.FINE, MessageFormat.format("lsb-release: {0}", line));
                     this.family = line.replace("DISTRIB_ID=", "").replaceAll("^\"|\"$", "").trim();
                 } else if (line.startsWith("DISTRIB_RELEASE=") && this.versionId == null) {
-                    LOG.debug("lsb-release: {}", line);
+                    LOG.log(Level.FINE, MessageFormat.format("lsb-release: {0}", line));
                     this.versionId = line.replace("DISTRIB_RELEASE=", "").replaceAll("^\"|\"$", "").trim();
                 } else if (line.startsWith("DISTRIB_CODENAME=") && this.codeName == null) {
-                    LOG.debug("lsb-release: {}", line);
+                    LOG.log(Level.FINE, MessageFormat.format("lsb-release: {0}", line));
                     this.codeName = line.replace("DISTRIB_CODENAME=", "").replaceAll("^\"|\"$", "").trim();
                 }
             }
@@ -484,7 +484,7 @@ public class LinuxOperatingSystem extends AbstractOperatingSystem {
             List<String> osRelease = FileUtil.readFile(filename);
             // Search for Distrib release x.x (Codename)
             for (String line : osRelease) {
-                LOG.debug("{}: {}", filename, line);
+                LOG.log(Level.FINE, MessageFormat.format("{0}: {1}", filename, line));
                 if (line.contains(" release ")) {
                     this.family = parseRelease(line, " release ");
                     // If this parses properly we're done

@@ -18,19 +18,18 @@
  */
 package oshi.hardware.platform.linux;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import oshi.hardware.common.AbstractCentralProcessor;
 import oshi.jna.platform.linux.Libc;
 import oshi.util.ExecutingCommand;
 import oshi.util.FileUtil;
 import oshi.util.ParseUtil;
 import oshi.util.platform.linux.ProcUtil;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * A CPU as defined in Linux /proc.
@@ -43,7 +42,7 @@ public class LinuxCentralProcessor extends AbstractCentralProcessor {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Logger LOG = LoggerFactory.getLogger(LinuxCentralProcessor.class);
+    private static final Logger LOG = Logger.getLogger(LinuxCentralProcessor.class.getName());
 
     /**
      * Create a Processor
@@ -55,7 +54,7 @@ public class LinuxCentralProcessor extends AbstractCentralProcessor {
         // Initialize tick arrays
         initTicks();
 
-        LOG.debug("Initialized Processor");
+        LOG.log(Level.FINE, "Initialized Processor");
     }
 
     private void initVars() {
@@ -161,11 +160,11 @@ public class LinuxCentralProcessor extends AbstractCentralProcessor {
         }
         // Force at least one processor
         if (this.logicalProcessorCount < 1) {
-            LOG.error("Couldn't find logical processor count. Assuming 1.");
+            LOG.log(Level.SEVERE, "Couldn't find logical processor count. Assuming 1.");
             this.logicalProcessorCount = 1;
         }
         if (this.physicalProcessorCount < 1) {
-            LOG.error("Couldn't find physical processor count. Assuming 1.");
+            LOG.log(Level.SEVERE, "Couldn't find physical processor count. Assuming 1.");
             this.physicalProcessorCount = 1;
         }
     }

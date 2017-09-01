@@ -22,9 +22,9 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Iterator;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.threeten.bp.LocalDate;
 import org.threeten.bp.format.DateTimeFormatter;
 import org.threeten.bp.format.DateTimeParseException;
@@ -35,7 +35,7 @@ import org.threeten.bp.format.DateTimeParseException;
  * @author dblock[at]dblock[dot]org
  */
 public class FormatUtil {
-    private static Logger LOG = LoggerFactory.getLogger(FormatUtil.class);
+    private static Logger LOG = Logger.getLogger(FormatUtil.class.getName());
 
     /**
      * Binary prefixes, used in IEC Standard for naming bytes.
@@ -245,7 +245,7 @@ public class FormatUtil {
         try {
             return date == null ? null : LocalDate.parse(date, DATE_FORMATTER);
         } catch (DateTimeParseException dtpe) {
-            LOG.warn("Date parse error: " + dtpe);
+            LOG.log(Level.WARNING, "Date parse error: " + dtpe);
             return null;
         }
     }

@@ -24,9 +24,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import oshi.hardware.NetworkIF;
 import oshi.hardware.Networks;
@@ -40,7 +39,7 @@ public abstract class AbstractNetworks implements Networks {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Logger LOG = LoggerFactory.getLogger(AbstractNetworks.class);
+    private static final Logger LOG = Logger.getLogger(AbstractNetworks.class.getName());
 
     /**
      * {@inheritDoc}
@@ -59,7 +58,7 @@ public abstract class AbstractNetworks implements Networks {
                 }
             }
         } catch (SocketException ex) {
-            LOG.error("Socket exception when retrieving network interfaces: " + ex);
+            LOG.log(Level.SEVERE, "Socket exception when retrieving network interfaces: " + ex);
         }
         return result.toArray(new NetworkIF[result.size()]);
     }

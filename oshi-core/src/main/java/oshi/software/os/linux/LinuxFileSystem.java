@@ -20,14 +20,14 @@ package oshi.software.os.linux;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import oshi.software.os.FileSystem;
 import oshi.software.os.OSFileStore;
@@ -47,7 +47,7 @@ public class LinuxFileSystem implements FileSystem {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Logger LOG = LoggerFactory.getLogger(LinuxFileSystem.class);
+    private static final Logger LOG = Logger.getLogger(LinuxFileSystem.class.getName());
 
     // Linux defines a set of virtual file systems
     private final List<String> pseudofs = Arrays.asList(new String[] { //
@@ -118,7 +118,7 @@ public class LinuxFileSystem implements FileSystem {
                     // Store UUID as value with path (e.g., /dev/sda1) as key
                     uuidMap.put(uuid.getCanonicalPath(), uuid.getName().toLowerCase());
                 } catch (IOException e) {
-                    LOG.error("Couldn't get canonical path for {}. {}", uuid.getName(), e);
+                    LOG.log(Level.SEVERE, MessageFormat.format("Couldn't get canonical path for {0}. {1}", uuid.getName(), e));
                 }
             }
         }

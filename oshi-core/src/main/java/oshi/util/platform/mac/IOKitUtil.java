@@ -18,9 +18,6 @@
  */
 package oshi.util.platform.mac;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.PointerByReference;
 
@@ -31,13 +28,17 @@ import oshi.jna.platform.mac.CoreFoundation.CFTypeRef;
 import oshi.jna.platform.mac.IOKit;
 import oshi.jna.platform.mac.IOKit.MachPort;
 
+import java.text.MessageFormat;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  * Provides utilities for IOKit
  *
  * @author widdis[at]gmail[dot]com
  */
 public class IOKitUtil {
-    private static final Logger LOG = LoggerFactory.getLogger(IOKitUtil.class);
+    private static final Logger LOG = Logger.getLogger(IOKitUtil.class.getName());
 
     private static MachPort masterPort = new MachPort();
 
@@ -53,7 +54,7 @@ public class IOKitUtil {
         if (masterPort.getValue() == 0) {
             int result = IOKit.INSTANCE.IOMasterPort(0, masterPort);
             if (result != 0) {
-                LOG.error(String.format("Error: IOMasterPort() = %08x", result));
+                LOG.log(Level.SEVERE, String.format("Error: IOMasterPort() = %08x", result));
                 return result;
             }
         }
@@ -69,7 +70,7 @@ public class IOKitUtil {
         if (setMasterPort() == 0) {
             int root = IOKit.INSTANCE.IORegistryGetRootEntry(masterPort.getValue());
             if (root == 0) {
-                LOG.error("No IO Root found.");
+                LOG.log(Level.SEVERE, "No IO Root found.");
             }
             return root;
         }
@@ -88,7 +89,7 @@ public class IOKitUtil {
             int service = IOKit.INSTANCE.IOServiceGetMatchingService(masterPort.getValue(),
                     IOKit.INSTANCE.IOServiceMatching(serviceName));
             if (service == 0) {
-                LOG.error("No service found: {}", serviceName);
+                LOG.log(Level.SEVERE, MessageFormat.format("No service found: {0}", serviceName));
             }
             return service;
         }

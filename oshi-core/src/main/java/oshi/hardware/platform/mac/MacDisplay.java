@@ -20,9 +20,8 @@ package oshi.hardware.platform.mac;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.PointerByReference;
@@ -45,13 +44,13 @@ public class MacDisplay extends AbstractDisplay {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Logger LOG = LoggerFactory.getLogger(MacDisplay.class);
+    private static final Logger LOG = Logger.getLogger(MacDisplay.class.getName());
 
     private static final CFStringRef cfEdid = CFStringRef.toCFString("IODisplayEDID");
 
     public MacDisplay(byte[] edid) {
         super(edid);
-        LOG.debug("Initialized MacDisplay");
+        LOG.log(Level.FINE, "Initialized MacDisplay");
     }
 
     /**

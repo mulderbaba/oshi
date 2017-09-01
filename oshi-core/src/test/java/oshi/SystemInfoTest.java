@@ -20,9 +20,7 @@ package oshi;
 
 import java.util.Arrays;
 import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.logging.Logger;
 
 import oshi.hardware.Baseboard;
 import oshi.hardware.CentralProcessor;
@@ -62,58 +60,58 @@ public class SystemInfoTest {
      */
     public static void main(String[] args) {
         // Options: ERROR > WARN > INFO > DEBUG > TRACE
-        System.setProperty(org.slf4j.impl.SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "INFO");
-        System.setProperty(org.slf4j.impl.SimpleLogger.LOG_FILE_KEY, "System.err");
-        Logger LOG = LoggerFactory.getLogger(SystemInfoTest.class);
+        Logger LOG = Logger.getLogger(SystemInfoTest.class.getName());
 
         LOG.info("Initializing System...");
-        SystemInfo si = new SystemInfo();
+        SystemInfo systemInfo = new SystemInfo();
+        System.out.println("-----------1: " + systemInfo);
+        HardwareAbstractionLayer hardwareAbstractionLayer = systemInfo.getHardware();
+        System.out.println("-----------a:" + hardwareAbstractionLayer);
 
-        HardwareAbstractionLayer hal = si.getHardware();
-        OperatingSystem os = si.getOperatingSystem();
-
-        System.out.println(os);
-
-        LOG.info("Checking computer system...");
-        printComputerSystem(hal.getComputerSystem());
-
-        LOG.info("Checking Processor...");
-        printProcessor(hal.getProcessor());
-
-        LOG.info("Checking Memory...");
-        printMemory(hal.getMemory());
-
-        LOG.info("Checking CPU...");
-        printCpu(hal.getProcessor());
-
-        LOG.info("Checking Processes...");
-        printProcesses(os, hal.getMemory());
-
-        LOG.info("Checking Sensors...");
-        printSensors(hal.getSensors());
-
-        LOG.info("Checking Power sources...");
-        printPowerSources(hal.getPowerSources());
-
-        LOG.info("Checking Disks...");
-        printDisks(hal.getDiskStores());
-
-        LOG.info("Checking File System...");
-        printFileSystem(os.getFileSystem());
-
-        LOG.info("Checking Network interfaces...");
-        printNetworkInterfaces(hal.getNetworkIFs());
-
-        LOG.info("Checking Network parameterss...");
-        printNetworkParameters(os.getNetworkParams());
-
-        // hardware: displays
-        LOG.info("Checking Displays...");
-        printDisplays(hal.getDisplays());
-
-        // hardware: USB devices
-        LOG.info("Checking USB Devices...");
-        printUsbDevices(hal.getUsbDevices(true));
+        GlobalMemory memory = hardwareAbstractionLayer.getMemory();
+        System.out.println(memory);
+//        System.out.println(os);
+//
+//        LOG.info("Checking computer system...");
+//        printComputerSystem(hal.getComputerSystem());
+//
+//        LOG.info("Checking Processor...");
+//        printProcessor(hal.getProcessor());
+//
+//        LOG.info("Checking Memory...");
+//        printMemory(hal.getMemory());
+//
+//        LOG.info("Checking CPU...");
+//        printCpu(hal.getProcessor());
+//
+//        LOG.info("Checking Processes...");
+//        printProcesses(os, hal.getMemory());
+//
+//        LOG.info("Checking Sensors...");
+//        printSensors(hal.getSensors());
+//
+//        LOG.info("Checking Power sources...");
+//        printPowerSources(hal.getPowerSources());
+//
+//        LOG.info("Checking Disks...");
+//        printDisks(hal.getDiskStores());
+//
+//        LOG.info("Checking File System...");
+//        printFileSystem(os.getFileSystem());
+//
+//        LOG.info("Checking Network interfaces...");
+//        printNetworkInterfaces(hal.getNetworkIFs());
+//
+//        LOG.info("Checking Network parameterss...");
+//        printNetworkParameters(os.getNetworkParams());
+//
+//        // hardware: displays
+//        LOG.info("Checking Displays...");
+//        printDisplays(hal.getDisplays());
+//
+//        // hardware: USB devices
+//        LOG.info("Checking USB Devices...");
+//        printUsbDevices(hal.getUsbDevices(true));
     }
 
     private static void printComputerSystem(final ComputerSystem computerSystem) {
